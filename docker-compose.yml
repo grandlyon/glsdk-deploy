@@ -1,0 +1,68 @@
+version: "3.0"
+
+services:
+
+  federal-db:
+    image: mariadb:10.2
+    restart: unless-stopped
+    volumes:
+      - "federal-data:/var/lib/mysql"
+    env_file:
+      - ./${ENVIRONMENT}/federaldb.env
+
+  federal-phpmyadmin:
+    image: phpmyadmin/phpmyadmin:4.7
+    restart: unless-stopped
+    environment:
+      - PMA_HOST=federal-db
+    ports:
+      - "8080:80"
+
+  auth-db:
+    image: mariadb:10.2
+    restart: unless-stopped
+    volumes:
+      - "auth-data:/var/lib/mysql"
+    env_file:
+      - ./${ENVIRONMENT}/authdb.env
+
+  auth-phpmyadmin:
+    image: phpmyadmin/phpmyadmin:4.7
+    restart: unless-stopped
+    environment:
+      - PMA_HOST=auth-db
+    ports:
+      - "8081:80"
+
+  server:
+    image: grandlyon/glsdk-server:latest
+    restart: unless-stopped
+    volumes:
+      - server-storage:/storage
+    depends_on:
+      - auth-db
+      - federal-db
+    networks:
+      default:
+        aliases:
+          - api
+    env_file:
+      - ./${ENVIRONMENT}/server.env
+
+  webapp:
+    image: grandlyon/glsdk-webapp:latest
+
+  proxy: 
+    image: grandlyon/glsdk-proxy:latest
+    restart: unless-stopped
+    depends_on:
+      - webapp
+      - server
+    ports:
+      - "80:80"
+      - "443:443"
+
+volumes:
+  auth-data:
+  federal-data:
+  server-storage:
