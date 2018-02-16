@@ -13,7 +13,7 @@ before_script:
   - sudo install /tmp/docker-machine /usr/local/bin/docker-machine
   - docker-machine ls
   - docker-machine create --driver generic --generic-ip-address=$IP_ADDRESS --generic-ssh-key id_rsa integration-server
-  - eval $(docker-machine env integration-server)
 
 script:
+  - eval $(docker-machine env integration-server)
   - ENVIRONMENT=integration docker-compose up -d
