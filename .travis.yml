@@ -5,7 +5,15 @@ language: generic
 services:
   - docker
 
-script:
-  - curl -L https://github.com/docker/machine/releases/download/v0.13.0/docker-machine-`uname -s`-`uname -m` >/tmp/docker-machine
+before_install:
+  - openssl aes-256-cbc -K $encrypted_4551da0a6112_key -iv $encrypted_4551da0a6112_iv -in id_rsa.enc -out id_rsa -d
+
+before_script:
+  - curl -L https://github.com/docker/machine/releases/download/v0.13.0/docker-machine-`uname -s`-`uname -m` > /tmp/docker-machine
   - sudo install /tmp/docker-machine /usr/local/bin/docker-machine
   - docker-machine ls
+  - docker-machine create --driver generic --generic-ip-address=$IP_ADDRESS --generic-ssh-key id_rsa integration-server
+  - eval $(docker-machine env integration-server)
+
+script:
+  - ENVIRONMENT=integration docker-compose up -d
