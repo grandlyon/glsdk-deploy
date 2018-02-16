@@ -16,4 +16,4 @@ before_script:
 
 script:
   - eval $(docker-machine env integration-server)
-  - ENVIRONMENT=integration docker-compose up -d
+  - ENVIRONMENT=integration docker-compose -p grandlyon up -d
