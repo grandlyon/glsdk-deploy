@@ -18,19 +18,19 @@ services:
     ports:
       - "8080:80"
 
-  auth-db:
+  app-db:
     image: mariadb:10.2
     restart: unless-stopped
     volumes:
-      - "auth-data:/var/lib/mysql"
+      - "app-data:/var/lib/mysql"
     env_file:
-      - ./${ENVIRONMENT}/authdb.env
+      - ./${ENVIRONMENT}/appdb.env
 
-  auth-phpmyadmin:
+  app-phpmyadmin:
     image: phpmyadmin/phpmyadmin:4.7
     restart: unless-stopped
     environment:
-      - PMA_HOST=auth-db
+      - PMA_HOST=app-db
     ports:
       - "8081:80"
 
@@ -40,7 +40,7 @@ services:
     volumes:
       - server-storage:/storage
     depends_on:
-      - auth-db
+      - app-db
       - federal-db
     networks:
       default:
@@ -63,6 +63,6 @@ services:
       - "443:443"
 
 volumes:
-  auth-data:
+  app-data:
   federal-data:
   server-storage:
